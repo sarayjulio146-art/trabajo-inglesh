@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DentiaSense – See it. Care it.</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+/* Colores principales en variables */
+:root{--azul:#2f5bff;--lila:#b79cff;--rosa:#ff7ac8;--fondo:#f4f6ff;--fondo2:#ece4ff;--texto:#161a3a;--tarjeta:rgba(255,255,255,.65);--borde:rgba(47,91,255,.18);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--fondo:#0b0e29;--fondo2:#1a1244;--texto:#eef0ff;--tarjeta:rgba(255,255,255,.07);--borde:rgba(183,156,255,.25);color-scheme:dark}}
+*{box-sizing:border-box;margin:0}
+body{font-family:'Outfit',Arial,sans-serif;color:var(--texto);background:linear-gradient(160deg,var(--fondo),var(--fondo2));line-height:1.6;overflow-x:hidden}
+h1,h2,h3{line-height:1.15}
+section{padding:90px 6%;max-width:1200px;margin:auto}
+h2{font-size:clamp(1.8rem,4vw,2.8rem);text-align:center;margin-bottom:12px}
+.sub{text-align:center;max-width:680px;margin:0 auto 40px;opacity:.8}
+.grad{background:linear-gradient(90deg,var(--azul),var(--lila),var(--rosa));-webkit-background-clip:text;background-clip:text;color:transparent}
+/* Menú */
+nav{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;justify-content:space-between;align-items:center;padding:12px 6%;padding-top:calc(12px + env(safe-area-inset-top,0px));backdrop-filter:blur(14px);background:var(--tarjeta);border-bottom:1px solid var(--borde)}
+.logo{font-weight:700;font-size:1.3rem;text-decoration:none;color:var(--texto)}
+.logo span{color:var(--azul)}
+nav ul{display:flex;gap:22px;list-style:none;padding:0}
+nav a{color:var(--texto);text-decoration:none;font-size:.95rem}
+nav a:hover{color:var(--azul)}
+#menuBtn{display:none;background:none;border:0;font-size:1.6rem;color:var(--texto);cursor:pointer}
+@media(max-width:760px){#menuBtn{display:block}nav ul{display:none;position:absolute;top:100%;left:0;right:0;flex-direction:column;padding:16px 6%;background:var(--fondo);border-bottom:1px solid var(--borde)}nav ul.abierto{display:flex}}
+/* Inicio */
+#hero{max-width:none;min-height:100vh;display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:20px;padding-top:110px;position:relative;overflow:hidden;background:radial-gradient(circle at 80% 20%,rgba(255,122,200,.3),transparent 45%),radial-gradient(circle at 10% 80%,rgba(47,91,255,.28),transparent 50%)}
+#particulas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.hero-txt,.hero-vis{position:relative;z-index:2}
+.hero-txt{padding-left:6%}
+.eslogan{letter-spacing:.3em;text-transform:uppercase;font-size:.85rem;color:var(--azul);font-weight:600}
+#hero h1{font-size:clamp(2.2rem,5vw,4rem);margin:14px 0}
+.btn{display:inline-block;margin-top:22px;padding:14px 30px;border:0;border-radius:40px;color:#fff;font-family:inherit;font-size:1rem;font-weight:600;cursor:pointer;text-decoration:none;background:linear-gradient(90deg,var(--azul),var(--lila),var(--rosa));box-shadow:0 0 25px rgba(47,91,255,.45);transition:transform .25s,box-shadow .25s}
+.btn:hover{transform:translateY(-3px) scale(1.04);box-shadow:0 0 40px rgba(255,122,200,.6)}
+.hero-vis{padding-right:6%}
+@media(max-width:860px){#hero{grid-template-columns:1fr;text-align:center}.hero-txt{padding:0 6%}.hero-vis{padding:0 6%}}
+/* Visor 3D */
+.visor{position:relative;width:100%;height:420px;border-radius:26px;background:radial-gradient(circle at 50% 40%,rgba(183,156,255,.45),rgba(47,91,255,.12));border:1px solid var(--borde);box-shadow:0 0 50px rgba(47,91,255,.25);overflow:hidden}
+.visor canvas{display:block;width:100%;height:100%;cursor:grab}
+.visor small{position:absolute;bottom:10px;left:0;right:0;text-align:center;opacity:.7;font-size:.8rem;pointer-events:none}
+#aviso3d{position:absolute;inset:0;display:none;align-items:center;justify-content:center;text-align:center;padding:20px}
+/* Simulador */
+.colores{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-bottom:30px}
+.cbtn{border:2px solid transparent;border-radius:40px;padding:11px 22px;font-family:inherit;font-weight:600;font-size:1rem;color:#fff;cursor:pointer;transition:transform .2s,box-shadow .2s}
+.cbtn:hover{transform:scale(1.07)}
+.cbtn.activo{border-color:var(--texto);box-shadow:0 0 22px currentColor}
+.sim{display:grid;grid-template-columns:240px 1fr;gap:30px;align-items:center;padding:30px;border-radius:26px;background:var(--tarjeta);border:1px solid var(--borde);backdrop-filter:blur(10px);transition:box-shadow .6s}
+@media(max-width:700px){.sim{grid-template-columns:1fr;text-align:center}}
+.cepillo{position:relative;height:200px;display:flex;align-items:center;justify-content:center}
+.gota{width:110px;height:110px;background:var(--c,#2f5bff);border-radius:50% 0 50% 50%;transform:rotate(-45deg);box-shadow:0 0 45px var(--c,#2f5bff),inset -10px -10px 20px rgba(0,0,0,.18),inset 10px 10px 20px rgba(255,255,255,.45);transition:background .8s,box-shadow .8s}
+.gota.anima{animation:cae .9s ease}
+@keyframes cae{0%{transform:translateY(-70px) rotate(-45deg) scale(.4);opacity:0}60%{transform:translateY(10px) rotate(-45deg) scale(1.1);opacity:1}100%{transform:translateY(0) rotate(-45deg) scale(1)}}
+#simNombre{font-size:1.7rem;margin-bottom:8px;color:var(--c,#2f5bff);transition:color .6s}
+.reco{margin-top:14px;padding:14px 18px;border-left:4px solid var(--c,#2f5bff);background:rgba(183,156,255,.15);border-radius:10px}
+.nota{margin-top:16px;font-size:.85rem;opacity:.75;font-style:italic}
+/* Pasos, tarjetas, FAQ */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:22px}
+.card{padding:28px;border-radius:22px;background:var(--tarjeta);border:1px solid var(--borde);backdrop-filter:blur(10px);transition:transform .3s,box-shadow .3s}
+.card:hover{transform:translateY(-8px);box-shadow:0 12px 40px rgba(47,91,255,.25)}
+.num{font-size:2.6rem;font-weight:700}
+.icono{font-size:2rem;margin-bottom:8px}
+.tech{display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:center}
+@media(max-width:760px){.tech{grid-template-columns:1fr}}
+.tech p{margin-bottom:14px}
+details{margin-bottom:12px;padding:16px 22px;border-radius:16px;background:var(--tarjeta);border:1px solid var(--borde)}
+summary{cursor:pointer;font-weight:600;font-size:1.05rem}
+details p{margin-top:10px;opacity:.85}
+/* Pie */
+footer{text-align:center;padding:50px 6% calc(30px + env(safe-area-inset-bottom,0px));background:linear-gradient(90deg,rgba(47,91,255,.15),rgba(255,122,200,.15))}
+.redes{display:flex;gap:14px;justify-content:center;margin:18px 0}
+.redes a{padding:8px 16px;border-radius:30px;border:1px solid var(--borde);color:var(--texto);text-decoration:none;transition:background .2s}
+.redes a:hover{background:var(--azul);color:#fff}
+/* Aparecer al hacer scroll */
+.rev{opacity:0;transform:translateY(30px);transition:opacity .8s,transform .8s}
+.rev.ver{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="#hero">Dentia<span>Sense</span></a>
+  <button id="menuBtn" aria-label="Menu">☰</button>
+  <ul id="menu">
+    <li><a href="#producto">Product 3D</a></li>
+    <li><a href="#simulador">Simulator</a></li>
+    <li><a href="#como">How It Works</a></li>
+    <li><a href="#tecnologia">Technology</a></li>
+    <li><a href="#faq">FAQ</a></li>
+  </ul>
+</nav>
+
+<section id="hero">
+  <canvas id="particulas"></canvas>
+  <div class="hero-txt">
+    <p class="eslogan">See it. Care it.</p>
+    <h1>The Future of <span class="grad">Oral Health</span> Is Here</h1>
+    <p>DentiaSense is a conceptual smart toothpaste that uses colorimetric technology to display different colors when it touches your gums, turning everyday brushing into a visual experience.</p>
+    <a class="btn" href="#tecnologia">Explore Our Technology</a>
+  </div>
+  <div class="hero-vis">
+    <!-- Aquí va el modelo 3D principal -->
+    <div class="visor" id="visor"><div id="aviso3d">3D view is not available on this device.</div><small>Drag to rotate · Scroll to zoom</small></div>
+  </div>
+</section>
+
+<section id="producto" class="rev">
+  <h2>Meet the <span class="grad">Product</span></h2>
+  <p class="sub">Rotate the tube and the box 360°, zoom in and look at the packaging from every angle. The model is provisional and ready to be replaced by a real GLB file.</p>
+  <div class="visor" id="visor2"><small>Drag to rotate · Scroll or pinch to zoom</small></div>
+</section>
+
+<section id="simulador" class="rev">
+  <h2>Discover Your <span class="grad">Oral Health Color</span></h2>
+  <p class="sub">Choose a color and see what it could represent in this concept demonstration.</p>
+  <div class="colores" id="colores"></div>
+  <div class="sim" id="sim">
+    <div class="cepillo"><div class="gota" id="gota"></div></div>
+    <div>
+      <h3 id="simNombre">Select a color</h3>
+      <p id="simDesc">Press one of the buttons above to start the simulation.</p>
+      <div class="reco" id="simReco">Care tip: brush twice a day and visit your dentist regularly.</div>
+    </div>
+  </div>
+</section>
+
+<section id="como" class="rev">
+  <h2>How It <span class="grad">Works</span></h2>
+  <p class="sub">Three simple steps.</p>
+  <div class="grid">
+    <div class="card"><div class="num grad">01</div><h3>APPLY</h3><p>Apply DentiaSense toothpaste to your toothbrush.</p></div>
+    <div class="card"><div class="num grad">02</div><h3>DETECT</h3><p>The colorimetric technology reacts in the conceptual demonstration.</p></div>
+    <div class="card"><div class="num grad">03</div><h3>DISCOVER</h3><p>Observe the color indicator and learn about possible oral-health signals.</p></div>
+  </div>
+</section>
+
+<section id="tecnologia" class="rev">
+  <h2>Colorimetric <span class="grad">Technology</span></h2>
+  <p class="sub">Color as a language for your smile.</p>
+  <div class="tech">
+    <div>
+      <p>Colorimetry is the science of measuring and interpreting color. In DentiaSense, the idea is to add chemical indicators to the paste that could change color when they interact with certain substances.</p>
+      <p>Similar to the pH strips used in laboratories, these indicators would react to changes such as acidity or the presence of specific compounds, and show a visible color as a result.</p>
+      <p>Each color would be linked to a possible oral-health signal. This is a concept for education and inspiration, not a validated medical technology.</p>
+    </div>
+    <div class="card">
+      <h3>Indicator spectrum</h3>
+      <div style="height:26px;border-radius:14px;margin:14px 0;background:linear-gradient(90deg,#2f5bff,#27c46b,#ffd93b,#ff9a2e,#ff3b4a,#9b5cff)"></div>
+      <p>Blue → Green → Yellow → Orange → Red → Purple</p>
+    </div>
+  </div>
+</section>
+
+<section id="beneficios" class="rev">
+  <h2>Why <span class="grad">DentiaSense</span></h2>
+  <p class="sub">Five ideas that make brushing a modern experience.</p>
+  <div class="grid">
+    <div class="card"><div class="icono">🦷</div><h3>Smart Oral Care</h3><p>Turns daily brushing into an informative routine.</p></div>
+    <div class="card"><div class="icono">🧪</div><h3>Innovative Technology</h3><p>A bold idea that mixes chemistry and design.</p></div>
+    <div class="card"><div class="icono">🎨</div><h3>Colorimetric Detection</h3><p>Colors that communicate possible signals.</p></div>
+    <div class="card"><div class="icono">👆</div><h3>Easy to Use</h3><p>Just apply, brush and observe.</p></div>
+    <div class="card"><div class="icono">✨</div><h3>Modern Dental Experience</h3><p>Premium look, feel and interaction.</p></div>
+  </div>
+</section>
+
+<section id="faq" class="rev">
+  <h2>Frequently Asked <span class="grad">Questions</span></h2>
+  <p class="sub">Quick answers about the concept.</p>
+  <details><summary>What is DentiaSense?</summary><p>DentiaSense is a conceptual smart toothpaste brand that imagines a paste able to show colors when it touches the gums.</p></details>
+  <details><summary>How does the color technology work?</summary><p>In the concept, colorimetric indicators change color when they interact with certain substances, in a similar way to pH indicators.</p></details>
+  <details><summary>What do the different colors mean?</summary><p>Green: possible gum irritation. Yellow: possible plaque buildup. Orange: possible cavity risk. Red: possible gum inflammation. Purple: possible tartar buildup. Blue: reference color with no alert.</p></details>
+  <details><summary>Is DentiaSense a real medical diagnostic tool?</summary><p>No. DentiaSense is an educational concept. It does not diagnose anything. Only a dentist can evaluate your oral health.</p></details>
+</section>
+
+<footer>
+  <a class="logo" href="#hero">Dentia<span>Sense</span></a>
+  <p class="eslogan" style="margin-top:6px">See it. Care it.</p>
+  <div class="redes"><a href="#">Cash</a><a href="#">Transfer</a></div>
+  <p>Contact: hello@dentiasense.example</p>
+  <p style="margin-top:10px"><b>Because your smile is our priority.</b></p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+// ---------- Menú del celular ----------
+document.getElementById('menuBtn').onclick = function(){
+  document.getElementById('menu').classList.toggle('abierto');
+};
+document.getElementById('menu').onclick = function(){
+  this.classList.remove('abierto');
+};
+
+// ---------- Simulador de colores ----------
+var datos = [
+  {n:'Green', c:'#27c46b', t:'Possible gum irritation', d:'This color could represent irritation in the gums, for example from brushing too hard.', r:'Use a soft-bristle brush, brush gently and avoid very abrasive products.'},
+  {n:'Yellow', c:'#f2c200', t:'Possible plaque buildup', d:'This color could signal that a sticky layer of bacteria (plaque) is accumulating on the teeth.', r:'Brush for two minutes, twice a day, and clean between your teeth with floss.'},
+  {n:'Orange', c:'#ff8a1f', t:'Possible cavity risk', d:'This color could represent an environment with higher risk of enamel damage.', r:'Reduce sugary snacks and drinks, and ask your dentist about fluoride.'},
+  {n:'Red', c:'#ff3b4a', t:'Possible gum inflammation', d:'This color could represent inflamed gums, which are often red and sensitive.', r:'Keep a gentle daily routine and book a check-up if the gums bleed or hurt.'},
+  {n:'Purple', c:'#9b5cff', t:'Possible tartar buildup', d:'This color could signal hardened plaque (tartar) that brushing alone cannot remove.', r:'Schedule a professional cleaning and keep up your flossing habit.'},
+  {n:'Blue', c:'#2f5bff', t:'Reference color: no alert', d:'In this simulation, blue is the reference color and shows no alert.', r:'Great! Keep brushing twice a day and visit your dentist regularly.'}
+];
+var cont = document.getElementById('colores');
+var gota = document.getElementById('gota');
+var sim = document.getElementById('sim');
+
+function elegir(i, boton){
+  var x = datos[i];
+  // Quitar la clase activo de todos los botones
+  var todos = cont.children;
+  for(var k = 0; k < todos.length; k++){ todos[k].classList.remove('activo'); }
+  boton.classList.add('activo');
+  // Cambiar color de la página del simulador
+  sim.style.setProperty('--c', x.c);
+  sim.style.boxShadow = '0 0 60px ' + x.c + '55';
+  gota.style.setProperty('--c', x.c);
+  // Reiniciar la animación de la gota
+  gota.classList.remove('anima');
+  void gota.offsetWidth;
+  gota.classList.add('anima');
+  document.getElementById('simNombre').textContent = x.t;
+  document.getElementById('simDesc').textContent = x.d;
+  document.getElementById('simReco').textContent = 'Care tip: ' + x.r;
+}
+datos.forEach(function(x, i){
+  var b = document.createElement('button');
+  b.className = 'cbtn';
+  b.textContent = x.n;
+  b.style.background = x.c;
+  b.style.color = (x.n === 'Yellow') ? '#222' : '#fff';
+  b.onclick = function(){ elegir(i, b); };
+  cont.appendChild(b);
+});
+
+// ---------- Partículas del inicio ----------
+var cv = document.getElementById('particulas');
+var cx = cv.getContext('2d');
+var puntos = [];
+function tamano(){ cv.width = cv.offsetWidth; cv.height = cv.offsetHeight; }
+tamano();
+window.addEventListener('resize', tamano);
+var colp = ['#2f5bff', '#b79cff', '#ff7ac8'];
+for(var p = 0; p < 60; p++){
+  puntos.push({x:Math.random()*cv.width, y:Math.random()*cv.height, r:Math.random()*3+1, v:Math.random()*0.6+0.2, c:colp[p % 3], f:Math.random()*6});
+}
+function dibujar(t){
+  cx.clearRect(0, 0, cv.width, cv.height);
+  puntos.forEach(function(q){
+    q.y -= q.v;
+    if(q.y < -5){ q.y = cv.height + 5; q.x = Math.random()*cv.width; }
+    // Destello: el brillo sube y baja
+    cx.globalAlpha = 0.4 + 0.5*Math.sin(t/400 + q.f);
+    cx.fillStyle = q.c;
+    cx.shadowColor = q.c;
+    cx.shadowBlur = 14;
+    cx.beginPath();
+    cx.arc(q.x, q.y, q.r, 0, Math.PI*2);
+    cx.fill();
+  });
+  requestAnimationFrame(dibujar);
+}
+requestAnimationFrame(dibujar);
+
+// ---------- Producto 3D (Three.js) ----------
+// Crea una textura con el nombre de la marca
+function textura(color1, color2){
+  var c = document.createElement('canvas');
+  c.width = 256; c.height = 512;
+  var g = c.getContext('2d');
+  var f = g.createLinearGradient(0, 0, 256, 512);
+  f.addColorStop(0, color1);
+  f.addColorStop(1, color2);
+  g.fillStyle = f;
+  g.fillRect(0, 0, 256, 512);
+  g.fillStyle = '#fff';
+  g.textAlign = 'center';
+  g.font = 'bold 44px Arial';
+  g.fillText('DentiaSense', 128, 230);
+  g.font = '24px Arial';
+  g.fillText('See it. Care it.', 128, 280);
+  return new THREE.CanvasTexture(c);
+}
+
+function crearProducto(){
+  var grupo = new THREE.Group();
+  // Caja
+  var caja = new THREE.Mesh(
+    new THREE.BoxGeometry(1.1, 3, 0.9),
+    new THREE.MeshStandardMaterial({map: textura('#2f5bff', '#b79cff'), roughness:0.3, metalness:0.2})
+  );
+  caja.position.set(-1.1, 0, 0);
+  grupo.add(caja);
+  // Tubo
+  var tubo = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.55, 0.4, 2.6, 32),
+    new THREE.MeshStandardMaterial({map: textura('#ffffff', '#ff7ac8'), roughness:0.25, metalness:0.1})
+  );
+  tubo.position.set(1, 0, 0);
+  tubo.rotation.z = 0.25;
+  grupo.add(tubo);
+  // Tapa del tubo
+  var tapa = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.3, 0.3, 0.5, 32),
+    new THREE.MeshStandardMaterial({color:0x2f5bff, roughness:0.2, metalness:0.6})
+  );
+  tapa.position.set(0.68, -1.5, 0);
+  tapa.rotation.z = 0.25;
+  grupo.add(tapa);
+  return grupo;
+}
+
+function iniciar3D(id, alto){
+  var visor = document.getElementById(id);
+  try{
+    var escena = new THREE.Scene();
+    var camara = new THREE.PerspectiveCamera(45, visor.clientWidth/visor.clientHeight, 0.1, 100);
+    camara.position.set(0, 0.5, alto);
+    var render = new THREE.WebGLRenderer({antialias:true, alpha:true});
+    render.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    render.setSize(visor.clientWidth, visor.clientHeight);
+    visor.insertBefore(render.domElement, visor.firstChild);
+    escena.add(new THREE.AmbientLight(0xffffff, 0.8));
+    var luz = new THREE.PointLight(0xff7ac8, 1.2);
+    luz.position.set(4, 3, 4);
+    escena.add(luz);
+    var luz2 = new THREE.PointLight(0x2f5bff, 1.2);
+    luz2.position.set(-4, -2, 3);
+    escena.add(luz2);
+    // Aquí se puede cargar un modelo GLB con GLTFLoader y agregarlo a la escena
+    var prod = crearProducto();
+    escena.add(prod);
+    var ctl = new THREE.OrbitControls(camara, render.domElement);
+    ctl.enableDamping = true;
+    ctl.autoRotate = true;
+    ctl.autoRotateSpeed = 2;
+    ctl.minDistance = 4;
+    ctl.maxDistance = 14;
+    function animar(t){
+      prod.position.y = Math.sin(t/800) * 0.12;
+      ctl.update();
+      render.render(escena, camara);
+      requestAnimationFrame(animar);
+    }
+    requestAnimationFrame(animar);
+    window.addEventListener('resize', function(){
+      camara.aspect = visor.clientWidth/visor.clientHeight;
+      camara.updateProjectionMatrix();
+      render.setSize(visor.clientWidth, visor.clientHeight);
+    });
+  }catch(e){
+    var av = document.getElementById('aviso3d');
+    if(av){ av.style.display = 'flex'; }
+  }
+}
+iniciar3D('visor', 9);
+iniciar3D('visor2', 8);
+
+// ---------- Aparecer al hacer scroll ----------
+var obs = new IntersectionObserver(function(lista){
+  lista.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('ver'); } });
+}, {threshold:0.12});
+document.querySelectorAll('.rev').forEach(function(s){ obs.observe(s); });
+</script>
+</body>
+</html>
